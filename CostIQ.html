@@ -1,0 +1,2081 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CostIQ — Enterprise Cost Intelligence & Autonomous Action</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0a0c10;
+  --bg2: #111318;
+  --bg3: #181c24;
+  --bg4: #1e2330;
+  --border: #252b38;
+  --border2: #2e3547;
+  --text: #e8ecf4;
+  --text2: #8b94a8;
+  --text3: #5a6278;
+  --accent: #00d4aa;
+  --accent2: #0099ff;
+  --accent3: #ff6b35;
+  --accent4: #a855f7;
+  --danger: #ff4455;
+  --warning: #ffb800;
+  --success: #00d4aa;
+  --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --glow: 0 0 20px rgba(0,212,170,0.15);
+  --sidebar-w: 260px;
+  --header-h: 64px;
+}
+[data-theme="light"] {
+  --bg: #f0f2f7;
+  --bg2: #ffffff;
+  --bg3: #f8f9fc;
+  --bg4: #eef0f6;
+  --border: #dde1ec;
+  --border2: #c8cede;
+  --text: #111827;
+  --text2: #4b5563;
+  --text3: #9ca3af;
+  --card-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  --glow: 0 0 20px rgba(0,212,170,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background 0.3s,color 0.3s;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* SIDEBAR */
+.sidebar{position:fixed;left:0;top:0;width:var(--sidebar-w);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform 0.3s,background 0.3s;}
+.sidebar-logo{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.logo-text{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.5px;}
+.logo-text span{color:var(--accent);}
+.sidebar-section{padding:8px 12px 4px;font-size:10px;font-weight:600;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-top:8px;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 16px;margin:2px 8px;border-radius:10px;cursor:pointer;transition:all 0.2s;color:var(--text2);font-size:14px;font-weight:500;position:relative;}
+.nav-item:hover{background:var(--bg3);color:var(--text);}
+.nav-item.active{background:linear-gradient(135deg,rgba(0,212,170,0.12),rgba(0,153,255,0.08));color:var(--accent);border:1px solid rgba(0,212,170,0.2);}
+.nav-item .nav-icon{font-size:18px;width:24px;text-align:center;}
+.nav-item .nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;}
+.nav-item .nav-badge.green{background:var(--accent);}
+.sidebar-bottom{margin-top:auto;padding:16px;border-top:1px solid var(--border);}
+.user-card{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;cursor:pointer;transition:background 0.2s;}
+.user-card:hover{background:var(--bg3);}
+.user-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#a855f7,#0099ff);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;}
+.user-info{flex:1;}
+.user-name{font-size:13px;font-weight:600;}
+.user-role{font-size:11px;color:var(--text3);}
+
+/* HEADER */
+.header{position:fixed;left:var(--sidebar-w);top:0;right:0;height:var(--header-h);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:99;transition:background 0.3s;}
+.header-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;}
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:8px 14px;cursor:pointer;flex:1;max-width:360px;transition:border-color 0.2s;}
+.search-bar:hover{border-color:var(--accent);}
+.search-bar input{background:none;border:none;outline:none;color:var(--text);font-size:13px;flex:1;font-family:'DM Sans',sans-serif;}
+.search-bar input::placeholder{color:var(--text3);}
+.kbd{font-family:'DM Mono',monospace;font-size:10px;background:var(--bg4);border:1px solid var(--border2);border-radius:4px;padding:2px 5px;color:var(--text3);}
+.header-actions{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.icon-btn{width:36px;height:36px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;font-size:16px;color:var(--text2);position:relative;}
+.icon-btn:hover{background:var(--bg4);color:var(--text);border-color:var(--accent);}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--danger);border-radius:50%;border:2px solid var(--bg2);}
+.theme-toggle{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.2s;}
+.theme-toggle:hover{border-color:var(--accent);}
+.toggle-switch{width:36px;height:20px;background:var(--border2);border-radius:20px;position:relative;transition:background 0.3s;}
+.toggle-switch.on{background:var(--accent);}
+.toggle-knob{position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:left 0.3s;box-shadow:0 2px 4px rgba(0,0,0,0.3);}
+.toggle-switch.on .toggle-knob{left:18px;}
+
+/* TICKER */
+.ticker-bar{position:fixed;left:var(--sidebar-w);top:var(--header-h);right:0;height:42px;background:linear-gradient(90deg,rgba(0,212,170,0.08),rgba(0,153,255,0.06));border-bottom:1px solid var(--border);display:flex;align-items:center;overflow:hidden;z-index:98;}
+.ticker-inner{display:flex;align-items:center;gap:0;animation:ticker 35s linear infinite;white-space:nowrap;}
+.ticker-item{display:flex;align-items:center;gap:8px;padding:0 28px;border-right:1px solid var(--border);font-size:12px;}
+.ticker-label{color:var(--text3);font-weight:500;}
+.ticker-val{font-family:'DM Mono',monospace;font-weight:600;}
+.ticker-val.up{color:var(--accent);}
+.ticker-val.down{color:var(--danger);}
+.ticker-val.warn{color:var(--warning);}
+@keyframes ticker{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+/* MAIN */
+.main{margin-left:var(--sidebar-w);margin-top:calc(var(--header-h) + 42px);padding:28px;min-height:calc(100vh - var(--header-h) - 42px);}
+
+/* PAGE */
+.page{display:none;}
+.page.active{display:block;animation:fadeIn 0.3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;transition:background 0.3s,border-color 0.2s;}
+.card:hover{border-color:var(--border2);}
+.card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.card-subtitle{font-size:12px;color:var(--text3);margin-bottom:20px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+
+/* KPI CARDS */
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:8px;transition:all 0.2s;cursor:pointer;position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kpi-color,var(--accent));}
+.kpi-card:hover{border-color:var(--kpi-color,var(--accent));transform:translateY(-2px);box-shadow:var(--card-shadow);}
+.kpi-label{font-size:11px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--text3);}
+.kpi-value{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;line-height:1;}
+.kpi-change{font-size:12px;display:flex;align-items:center;gap:4px;}
+.kpi-change.up{color:var(--accent);}
+.kpi-change.down{color:var(--danger);}
+.kpi-icon{position:absolute;top:20px;right:20px;font-size:28px;opacity:0.15;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;}
+.badge.critical{background:rgba(255,68,85,0.12);color:var(--danger);border:1px solid rgba(255,68,85,0.25);}
+.badge.warning{background:rgba(255,184,0,0.12);color:var(--warning);border:1px solid rgba(255,184,0,0.25);}
+.badge.success{background:rgba(0,212,170,0.12);color:var(--accent);border:1px solid rgba(0,212,170,0.25);}
+.badge.info{background:rgba(0,153,255,0.12);color:var(--accent2);border:1px solid rgba(0,153,255,0.25);}
+.badge.purple{background:rgba(168,85,247,0.12);color:var(--accent4);border:1px solid rgba(168,85,247,0.25);}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+.btn-primary{background:var(--accent);color:#0a0c10;}
+.btn-primary:hover{background:#00efc0;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,212,170,0.3);}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border2);}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
+.btn-danger{background:rgba(255,68,85,0.12);color:var(--danger);border:1px solid rgba(255,68,85,0.25);}
+.btn-danger:hover{background:rgba(255,68,85,0.2);}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px;}
+.btn-icon{width:32px;height:32px;padding:0;border-radius:8px;justify-content:center;}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--bg3);}
+thead th{padding:12px 16px;text-align:left;font-size:11px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.15s;}
+tbody tr:hover{background:var(--bg3);}
+tbody tr:last-child{border-bottom:none;}
+tbody td{padding:12px 16px;font-size:13px;}
+.mono{font-family:'DM Mono',monospace;font-size:12px;}
+
+/* PROGRESS BAR */
+.prog-bar{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;transition:width 0.6s ease;}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.section-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;}
+.section-desc{font-size:13px;color:var(--text3);margin-top:2px;}
+
+/* TABS */
+.tabs{display:flex;gap:4px;background:var(--bg3);border-radius:12px;padding:4px;border:1px solid var(--border);}
+.tab{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;color:var(--text2);}
+.tab.active{background:var(--bg2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+
+/* ALERT FEED */
+.alert-item{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-radius:12px;border:1px solid var(--border);margin-bottom:10px;transition:all 0.2s;background:var(--bg2);}
+.alert-item:hover{border-color:var(--border2);transform:translateX(3px);}
+.alert-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.alert-body{flex:1;}
+.alert-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.alert-meta{font-size:11px;color:var(--text3);}
+.alert-actions{display:flex;gap:6px;flex-shrink:0;}
+
+/* METER */
+.risk-meter{position:relative;width:120px;height:60px;overflow:hidden;}
+.meter-bg{fill:none;stroke:var(--bg4);stroke-width:12;}
+.meter-fill{fill:none;stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset 1s ease,stroke 0.5s;}
+.meter-label{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;text-anchor:middle;fill:var(--text);}
+.meter-sublabel{font-size:9px;text-anchor:middle;fill:var(--text3);}
+
+/* HEATMAP */
+.heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.hm-cell{height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s;position:relative;}
+.hm-cell:hover{transform:scale(1.05);z-index:2;box-shadow:0 4px 12px rgba(0,0,0,0.3);}
+.hm-cell .tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:11px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.2s;z-index:10;}
+.hm-cell:hover .tooltip{opacity:1;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;width:580px;max-width:95vw;max-height:90vh;overflow-y:auto;transform:scale(0.95);transition:transform 0.2s;}
+.modal-overlay.open .modal{transform:scale(1);}
+.modal-header{padding:24px 24px 0;display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;}
+.modal-body{padding:20px 24px 24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+.close-btn{width:32px;height:32px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all 0.2s;}
+.close-btn:hover{background:var(--bg4);}
+
+/* NOTIFICATION PANEL */
+.notif-panel{position:fixed;top:calc(var(--header-h) + 10px);right:16px;width:360px;background:var(--bg2);border:1px solid var(--border2);border-radius:16px;z-index:150;box-shadow:var(--card-shadow);transform:translateY(-10px);opacity:0;pointer-events:none;transition:all 0.2s;max-height:80vh;overflow-y:auto;}
+.notif-panel.open{transform:translateY(0);opacity:1;pointer-events:all;}
+.notif-panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-family:'Syne',sans-serif;font-weight:700;}
+.notif-item{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;gap:12px;cursor:pointer;transition:background 0.15s;}
+.notif-item:hover{background:var(--bg3);}
+.notif-item:last-child{border-bottom:none;}
+.notif-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.notif-content .notif-title{font-size:13px;font-weight:600;}
+.notif-content .notif-desc{font-size:12px;color:var(--text3);margin-top:2px;}
+.notif-content .notif-time{font-size:11px;color:var(--text3);margin-top:4px;}
+
+/* CMD PALETTE */
+.cmd-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:300;display:flex;align-items:flex-start;justify-content:center;padding-top:15vh;opacity:0;pointer-events:none;transition:opacity 0.15s;}
+.cmd-overlay.open{opacity:1;pointer-events:all;}
+.cmd-palette{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:560px;max-width:95vw;overflow:hidden;transform:scale(0.97);transition:transform 0.15s;box-shadow:0 24px 80px rgba(0,0,0,0.5);}
+.cmd-overlay.open .cmd-palette{transform:scale(1);}
+.cmd-input-wrap{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);}
+.cmd-input{flex:1;background:none;border:none;outline:none;font-size:16px;color:var(--text);font-family:'DM Sans',sans-serif;}
+.cmd-results{max-height:340px;overflow-y:auto;}
+.cmd-item{display:flex;align-items:center;gap:12px;padding:12px 20px;cursor:pointer;transition:background 0.15s;}
+.cmd-item:hover,.cmd-item.selected{background:var(--bg3);}
+.cmd-item-icon{width:32px;height:32px;border-radius:8px;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.cmd-item-label{font-size:14px;font-weight:500;}
+.cmd-item-desc{font-size:12px;color:var(--text3);}
+.cmd-section-label{padding:8px 20px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);background:var(--bg3);}
+
+/* FORMULA BOX */
+.formula-box{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:12px 16px;font-family:'DM Mono',monospace;font-size:12px;margin:12px 0;}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:24px;}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border);}
+.tl-item{position:relative;margin-bottom:20px;}
+.tl-dot{position:absolute;left:-20px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--bg2);}
+.tl-dot.pending{background:var(--border2);}
+.tl-dot.warn{background:var(--warning);}
+.tl-label{font-size:13px;font-weight:600;}
+.tl-meta{font-size:11px;color:var(--text3);margin-top:2px;}
+
+/* CHART CONTAINER */
+.chart-wrap{position:relative;height:220px;}
+
+/* APPROVAL STEPS */
+.approval-step{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.approval-step:last-child{border-bottom:none;}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--bg4);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.step-num.done{background:var(--accent);border-color:var(--accent);color:#0a0c10;}
+.step-num.active{background:var(--accent2);border-color:var(--accent2);color:#fff;}
+
+/* VARIANCE TABLE */
+.var-positive{color:var(--danger);}
+.var-negative{color:var(--accent);}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:20px 0;}
+
+/* RECOMMENDATION CARD */
+.rec-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;transition:all 0.2s;}
+.rec-card:hover{border-color:var(--border2);transform:translateX(3px);}
+.rec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.rec-title{font-size:14px;font-weight:600;}
+.rec-saving{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--accent);}
+.rec-desc{font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.6;}
+.rec-actions{display:flex;gap:8px;}
+
+/* ANIMATIONS */
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+.pulse{animation:pulse 2s infinite;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-20px);}to{opacity:1;transform:translateX(0);}}
+.slide-in{animation:slideIn 0.4s ease forwards;}
+
+/* COST MATH DISPLAY */
+.math-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.math-row:last-child{border-bottom:none;font-weight:700;font-size:14px;color:var(--accent);}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3);}
+.empty-state .empty-icon{font-size:48px;margin-bottom:16px;opacity:0.4;}
+
+/* STATUS INDICATOR */
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+.status-dot.live{background:var(--accent);box-shadow:0 0 6px var(--accent);animation:pulse 2s infinite;}
+.status-dot.warn{background:var(--warning);}
+.status-dot.off{background:var(--text3);}
+
+/* DRAGGABLE PANEL indicator */
+.draggable-hint{font-size:10px;color:var(--text3);display:flex;align-items:center;gap:4px;}
+
+/* RESPONSIVE adjustments for very small screens */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .header,.ticker-bar,.main{left:0;margin-left:0;}
+  .grid-4,.grid-3{grid-template-columns:1fr 1fr;}
+  .grid-2{grid-template-columns:1fr;}
+}
+
+/* EXPORT BTN glow */
+.export-glow{box-shadow:0 0 16px rgba(0,212,170,0.25);}
+
+/* UTILITY */
+.flex{display:flex;}.items-center{align-items:center;}.gap-8{gap:8px;}.gap-12{gap:12px;}.gap-16{gap:16px;}
+.mt-8{margin-top:8px;}.mt-12{margin-top:12px;}.mt-16{margin-top:16px;}.mt-20{margin-top:20px;}.mt-24{margin-top:24px;}
+.mb-8{margin-bottom:8px;}.mb-12{margin-bottom:12px;}.mb-16{margin-bottom:16px;}.mb-20{margin-bottom:20px;}
+.fw-700{font-weight:700;}.text-sm{font-size:12px;}.text-xs{font-size:11px;}.text-muted{color:var(--text3);}
+.w-full{width:100%;}.truncate{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.relative{position:relative;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">💡</div>
+    <div class="logo-text">Cost<span>IQ</span></div>
+  </div>
+
+  <div class="sidebar-section">Overview</div>
+  <div class="nav-item active" onclick="navigate('dashboard',this)">
+    <span class="nav-icon">🏠</span> Dashboard
+  </div>
+  <div class="nav-item" onclick="navigate('analytics',this)">
+    <span class="nav-icon">📊</span> Analytics
+  </div>
+
+  <div class="sidebar-section">AI Agents</div>
+  <div class="nav-item" onclick="navigate('spend',this)">
+    <span class="nav-icon">🔍</span> Spend Intelligence
+    <span class="nav-badge">7</span>
+  </div>
+  <div class="nav-item" onclick="navigate('sla',this)">
+    <span class="nav-icon">📋</span> SLA & Penalty
+    <span class="nav-badge">3</span>
+  </div>
+  <div class="nav-item" onclick="navigate('resource',this)">
+    <span class="nav-icon">⚙️</span> Resource Optimizer
+    <span class="nav-badge green">12</span>
+  </div>
+  <div class="nav-item" onclick="navigate('finops',this)">
+    <span class="nav-icon">💰</span> Financial Ops
+    <span class="nav-badge">5</span>
+  </div>
+
+  <div class="sidebar-section">Management</div>
+  <div class="nav-item" onclick="navigate('approvals',this)">
+    <span class="nav-icon">✅</span> Approvals
+    <span class="nav-badge">4</span>
+  </div>
+  <div class="nav-item" onclick="navigate('playbooks',this)">
+    <span class="nav-icon">📖</span> Playbooks
+  </div>
+  <div class="nav-item" onclick="navigate('reports',this)">
+    <span class="nav-icon">📄</span> Reports
+  </div>
+  <div class="nav-item" onclick="navigate('settings',this)">
+    <span class="nav-icon">⚙️</span> Settings
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="user-card" onclick="openModal('userModal')">
+      <div class="user-avatar">RK</div>
+      <div class="user-info">
+        <div class="user-name">Rahul Kapoor</div>
+        <div class="user-role">CFO, Enterprise</div>
+      </div>
+      <span style="color:var(--text3);font-size:16px">⋯</span>
+    </div>
+  </div>
+</aside>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-title" id="pageTitle">Dashboard</div>
+  <div class="search-bar" onclick="openCmd()">
+    <span style="color:var(--text3)">🔍</span>
+    <input placeholder="Search agents, reports, vendors…" id="searchInput" readonly/>
+    <span class="kbd">⌘K</span>
+  </div>
+  <div class="header-actions">
+    <div class="icon-btn" title="Refresh" onclick="simulateRefresh(this)">🔄</div>
+    <div class="icon-btn" title="Notifications" onclick="toggleNotif()" id="notifBtn">
+      🔔 <span class="notif-dot"></span>
+    </div>
+    <div class="icon-btn" title="Export" onclick="openModal('exportModal')">📤</div>
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <span id="themeIcon">🌙</span>
+      <div class="toggle-switch" id="toggleSwitch">
+        <div class="toggle-knob"></div>
+      </div>
+      <span id="themeLabel">Dark</span>
+    </div>
+  </div>
+</header>
+
+<!-- TICKER BAR -->
+<div class="ticker-bar">
+  <div class="ticker-inner" id="tickerInner">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- ===== DASHBOARD ===== -->
+  <div class="page active" id="page-dashboard">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Command Center</div>
+        <div class="section-desc"><span class="status-dot live"></span>All agents active · Last sync 42s ago</div>
+      </div>
+      <div class="flex gap-8">
+        <button class="btn btn-secondary btn-sm" onclick="openModal('exportModal')">📤 Export</button>
+        <button class="btn btn-primary btn-sm" onclick="openModal('agentModal')">🤖 Run Agent</button>
+      </div>
+    </div>
+
+    <!-- KPI ROW -->
+    <div class="grid-4 mb-20">
+      <div class="kpi-card" style="--kpi-color:#00d4aa" onclick="navigate('spend',document.querySelector('[onclick*=spend]'))">
+        <div class="kpi-label">Cost Saved (MTD)</div>
+        <div class="kpi-value" id="kpi1">$2.47M</div>
+        <div class="kpi-change up">↑ 18.3% vs last month</div>
+        <div class="kpi-icon">💰</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#ff4455" onclick="navigate('spend',document.querySelector('[onclick*=spend]'))">
+        <div class="kpi-label">Anomalies Detected</div>
+        <div class="kpi-value" id="kpi2">143</div>
+        <div class="kpi-change down">↑ 7 new today</div>
+        <div class="kpi-icon">⚠️</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#ffb800" onclick="navigate('sla',document.querySelector('[onclick*=sla]'))">
+        <div class="kpi-label">SLA Breach Risk</div>
+        <div class="kpi-value" id="kpi3">3</div>
+        <div class="kpi-change down">Critical · $840K exposure</div>
+        <div class="kpi-icon">🚨</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#0099ff" onclick="navigate('resource',document.querySelector('[onclick*=resource]'))">
+        <div class="kpi-label">Resources Optimized</div>
+        <div class="kpi-value" id="kpi4">89</div>
+        <div class="kpi-change up">↑ 12 pending approval</div>
+        <div class="kpi-icon">⚙️</div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="grid-2 mb-20">
+      <div class="card">
+        <div class="card-title">💸 Cost Savings Trend</div>
+        <div class="card-subtitle">Monthly savings attributed to AI agent actions</div>
+        <div class="chart-wrap"><canvas id="savingsChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Anomaly Breakdown by Category</div>
+        <div class="card-subtitle">Distribution of detected anomalies this quarter</div>
+        <div class="chart-wrap"><canvas id="anomalyChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- BOTTOM ROW -->
+    <div class="grid-2">
+      <!-- LIVE ALERT FEED -->
+      <div class="card">
+        <div class="flex items-center gap-8 mb-16">
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">🔔 Live Alert Feed</div>
+          <span class="badge critical pulse">LIVE</span>
+          <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="navigate('sla',document.querySelector('[onclick*=sla]'))">View All</button>
+        </div>
+        <div id="alertFeed"></div>
+      </div>
+      <!-- AGENT ACTIVITY -->
+      <div class="card">
+        <div class="card-title mb-16">🤖 Agent Activity Log</div>
+        <div id="agentLog"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ANALYTICS ===== -->
+  <div class="page" id="page-analytics">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Analytics & Cost Math</div>
+        <div class="section-desc">Quantifiable financial impact — showing the math</div>
+      </div>
+      <div class="flex gap-8">
+        <div class="tabs">
+          <div class="tab active" onclick="setTab(this,'analytics')">Overview</div>
+          <div class="tab" onclick="setTab(this,'analytics')">By Agent</div>
+          <div class="tab" onclick="setTab(this,'analytics')">Trends</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-3 mb-20">
+      <div class="card">
+        <div class="card-title">📐 Cost Impact Formula</div>
+        <div class="card-subtitle">How we calculate savings</div>
+        <div class="formula-box">
+Net Savings = (Baseline Spend − Optimized Spend)<br>
+             × (1 − SLA Penalty Rate)<br>
+             × Resource Utilization Factor
+        </div>
+        <div class="math-row"><span>Baseline Spend (Q2)</span><span class="mono">$12.84M</span></div>
+        <div class="math-row"><span>Optimized Spend (Q2)</span><span class="mono">$10.37M</span></div>
+        <div class="math-row"><span>SLA Penalty Saved</span><span class="mono text" style="color:var(--accent)">$0.84M</span></div>
+        <div class="math-row"><span>Resource Savings</span><span class="mono" style="color:var(--accent)">$0.61M</span></div>
+        <div class="divider" style="margin:8px 0;"></div>
+        <div class="math-row"><span>Total Net Savings</span><span class="mono" style="color:var(--accent);font-size:18px">$3.88M</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎯 ROI by Agent</div>
+        <div class="card-subtitle">Return on AI investment</div>
+        <div style="margin-top:12px">
+          <div style="margin-bottom:16px">
+            <div class="flex items-center gap-8 mb-8"><span style="font-size:12px;font-weight:600;">Spend Intelligence</span><span class="mono text-sm" style="margin-left:auto;color:var(--accent)">$1.47M</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:68%;background:var(--accent)"></div></div>
+          </div>
+          <div style="margin-bottom:16px">
+            <div class="flex items-center gap-8 mb-8"><span style="font-size:12px;font-weight:600;">SLA Prevention</span><span class="mono text-sm" style="margin-left:auto;color:var(--warning)">$0.84M</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:39%;background:var(--warning)"></div></div>
+          </div>
+          <div style="margin-bottom:16px">
+            <div class="flex items-center gap-8 mb-8"><span style="font-size:12px;font-weight:600;">Resource Optimizer</span><span class="mono text-sm" style="margin-left:auto;color:var(--accent2)">$0.61M</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:28%;background:var(--accent2)"></div></div>
+          </div>
+          <div style="margin-bottom:16px">
+            <div class="flex items-center gap-8 mb-8"><span style="font-size:12px;font-weight:600;">Financial Ops</span><span class="mono text-sm" style="margin-left:auto;color:var(--accent4)">$0.96M</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:44%;background:var(--accent4)"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📅 Close Cycle Tracker</div>
+        <div class="card-subtitle">Month-end financial close progress</div>
+        <div class="timeline mt-12">
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-label">Data Ingestion</div>
+            <div class="tl-meta">✅ Completed · Mar 28, 9:00 AM</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-label">Reconciliation</div>
+            <div class="tl-meta">✅ 4,821 transactions reconciled</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--accent2)"></div>
+            <div class="tl-label">Variance Analysis</div>
+            <div class="tl-meta" style="color:var(--accent2)">🔄 In Progress · 73% complete</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot pending"></div>
+            <div class="tl-label">Root-cause Attribution</div>
+            <div class="tl-meta">⏳ Pending · Est. 2h 30m</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot pending"></div>
+            <div class="tl-label">CFO Sign-off</div>
+            <div class="tl-meta">⏳ Awaiting variance completion</div>
+          </div>
+        </div>
+        <div class="mt-16">
+          <div class="prog-bar" style="height:8px"><div class="prog-fill" style="width:58%;background:linear-gradient(90deg,var(--accent),var(--accent2))"></div></div>
+          <div class="flex items-center gap-8 mt-8"><span class="text-xs text-muted">58% complete</span><span class="text-xs text-muted" style="margin-left:auto">Est. close: Mar 31</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title mb-16">📈 Full Spend Analytics</div>
+      <div class="chart-wrap" style="height:280px"><canvas id="analyticsChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ===== SPEND INTELLIGENCE ===== -->
+  <div class="page" id="page-spend">
+    <div class="section-header">
+      <div>
+        <div class="section-title">🔍 Spend Intelligence Agent</div>
+        <div class="section-desc">Procurement, vendor & operations anomaly detection with autonomous action</div>
+      </div>
+      <div class="flex gap-8">
+        <button class="btn btn-secondary btn-sm" onclick="openModal('playbookModal')">📖 Generate Playbook</button>
+        <button class="btn btn-primary btn-sm" onclick="runSpendScan()">🔄 Run Scan</button>
+      </div>
+    </div>
+
+    <div class="grid-4 mb-20">
+      <div class="kpi-card" style="--kpi-color:#ff4455">
+        <div class="kpi-label">Anomalies Found</div>
+        <div class="kpi-value">143</div>
+        <div class="kpi-change down">7 new · High priority</div>
+        <div class="kpi-icon">🚨</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#ffb800">
+        <div class="kpi-label">Duplicate Spend</div>
+        <div class="kpi-value">$318K</div>
+        <div class="kpi-change down">23 duplicate invoices</div>
+        <div class="kpi-icon">📋</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#00d4aa">
+        <div class="kpi-label">Rate Optimization</div>
+        <div class="kpi-value">$1.14M</div>
+        <div class="kpi-change up">↑ Opportunity identified</div>
+        <div class="kpi-icon">💡</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#0099ff">
+        <div class="kpi-label">Playbooks Generated</div>
+        <div class="kpi-value">18</div>
+        <div class="kpi-change up">↑ 4 this week</div>
+        <div class="kpi-icon">📖</div>
+      </div>
+    </div>
+
+    <div class="grid-2 mb-20">
+      <div class="card">
+        <div class="card-title mb-4">🏢 Vendor Cost Comparison</div>
+        <div class="card-subtitle">Current vs optimized vendor rates</div>
+        <div class="flex gap-8 mb-16">
+          <div class="tabs" style="background:var(--bg3)">
+            <div class="tab active" onclick="setTab(this,'vendorChart')">Bar</div>
+            <div class="tab" onclick="setTab(this,'vendorChart')">Line</div>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="vendorChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title mb-4">📊 Spend by Category</div>
+        <div class="card-subtitle">Breakdown of enterprise spend distribution</div>
+        <div class="chart-wrap"><canvas id="spendPieChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ANOMALY TABLE -->
+    <div class="card mb-20">
+      <div class="flex items-center gap-8 mb-16">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;">⚠️ Anomaly Detection Table</div>
+        <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="filterAnomaly('all')">All</button>
+        <button class="btn btn-secondary btn-sm" onclick="filterAnomaly('critical')">Critical</button>
+        <button class="btn btn-secondary btn-sm" onclick="filterAnomaly('duplicate')">Duplicates</button>
+        <button class="btn btn-primary btn-sm" onclick="openModal('exportModal')">📤 Export</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>ID</th><th>Vendor / Source</th><th>Type</th><th>Amount</th><th>Detected</th><th>Severity</th><th>Action</th>
+          </tr></thead>
+          <tbody id="anomalyTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DUPLICATE SPEND -->
+    <div class="card">
+      <div class="flex items-center gap-8 mb-16">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;">🔁 Duplicate Spend Finder</div>
+        <span class="badge critical">23 duplicates · $318K exposure</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Invoice A</th><th>Invoice B</th><th>Vendor</th><th>Amount</th><th>Similarity</th><th>Action</th>
+          </tr></thead>
+          <tbody id="duplicateTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLA ===== -->
+  <div class="page" id="page-sla">
+    <div class="section-header">
+      <div>
+        <div class="section-title">📋 SLA & Penalty Prevention Agent</div>
+        <div class="section-desc">Detect approaching breaches, reroute work, shift resources, escalate before the financial hit lands</div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openModal('slaModal')">+ Add SLA Rule</button>
+    </div>
+
+    <!-- SLA SCORECARDS -->
+    <div class="grid-3 mb-20" id="slaCards"></div>
+
+    <div class="grid-2 mb-20">
+      <div class="card">
+        <div class="card-title mb-16">🚨 Active SLA Alerts</div>
+        <div id="slaAlerts"></div>
+      </div>
+      <div class="card">
+        <div class="card-title mb-4">💸 Penalty Exposure Calculator</div>
+        <div class="card-subtitle">Real-time financial impact of SLA breaches</div>
+        <div class="formula-box mt-12">
+Penalty = Contract Value × Breach Rate × Days Overdue<br>
+Risk Score = (Time to Breach / SLA Window) × Criticality
+        </div>
+        <div id="penaltyCalc"></div>
+        <div class="divider"></div>
+        <div class="math-row fw-700"><span>Total Penalty Exposure</span><span style="color:var(--danger);font-size:20px">$840,000</span></div>
+        <button class="btn btn-primary w-full mt-12" onclick="openModal('slaModal')" style="justify-content:center">🛡️ Initiate Prevention Actions</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title mb-16">📈 SLA Performance Trend</div>
+      <div class="chart-wrap" style="height:240px"><canvas id="slaChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ===== RESOURCE ===== -->
+  <div class="page" id="page-resource">
+    <div class="section-header">
+      <div>
+        <div class="section-title">⚙️ Resource Optimization Agent</div>
+        <div class="section-desc">Monitor utilization, recommend consolidation, execute approved changes</div>
+      </div>
+      <div class="flex gap-8">
+        <button class="btn btn-secondary btn-sm" onclick="openModal('approvalModal')">✅ Approve All</button>
+        <button class="btn btn-primary btn-sm" onclick="runResourceScan()">🔄 Analyze Now</button>
+      </div>
+    </div>
+
+    <div class="grid-4 mb-20">
+      <div class="kpi-card" style="--kpi-color:#0099ff">
+        <div class="kpi-label">Avg Tool Utilization</div>
+        <div class="kpi-value">41%</div>
+        <div class="kpi-change down">↓ 59% waste identified</div>
+        <div class="kpi-icon">🔧</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#a855f7">
+        <div class="kpi-label">Consolidation Ops</div>
+        <div class="kpi-value">12</div>
+        <div class="kpi-change up">Pending approval</div>
+        <div class="kpi-icon">📦</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#00d4aa">
+        <div class="kpi-label">Monthly Saving Opp.</div>
+        <div class="kpi-value">$61K</div>
+        <div class="kpi-change up">↑ If all approved</div>
+        <div class="kpi-icon">💡</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#ff6b35">
+        <div class="kpi-label">Over-provisioned</div>
+        <div class="kpi-value">34</div>
+        <div class="kpi-change down">Resources flagged</div>
+        <div class="kpi-icon">⚡</div>
+      </div>
+    </div>
+
+    <!-- HEATMAP -->
+    <div class="card mb-20">
+      <div class="card-title mb-4">🔥 Tool & Infrastructure Utilization Heatmap</div>
+      <div class="card-subtitle">Average utilization % by tool and team — last 7 days</div>
+      <div class="flex gap-8 mt-12 mb-8" id="heatmapLabels"></div>
+      <div class="heatmap mt-12" id="heatmap" style="grid-template-columns:repeat(8,1fr)"></div>
+      <div class="flex items-center gap-8 mt-12">
+        <span class="text-xs text-muted">Low</span>
+        <div style="width:120px;height:8px;border-radius:4px;background:linear-gradient(90deg,rgba(0,212,170,0.2),var(--accent))"></div>
+        <span class="text-xs text-muted">High</span>
+        <span class="text-xs text-muted" style="margin-left:auto">Click cell to view details</span>
+      </div>
+    </div>
+
+    <!-- RECOMMENDATIONS -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title mb-16">💡 Consolidation Recommendations</div>
+        <div id="recCards"></div>
+      </div>
+      <div class="card">
+        <div class="card-title mb-16">📋 Team Allocation Overview</div>
+        <div id="teamAllocation"></div>
+        <div class="divider"></div>
+        <div class="card-title mb-16">📜 Change Execution Log</div>
+        <div id="changeLog"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FINOPS ===== -->
+  <div class="page" id="page-finops">
+    <div class="section-header">
+      <div>
+        <div class="section-title">💰 Financial Operations Agent</div>
+        <div class="section-desc">Reconcile transactions, flag discrepancies, produce variance analyses with root-cause attribution</div>
+      </div>
+      <div class="flex gap-8">
+        <button class="btn btn-secondary btn-sm" onclick="openModal('exportModal')">📤 Export Report</button>
+        <button class="btn btn-primary btn-sm" onclick="openModal('reconcileModal')">🔄 Run Reconciliation</button>
+      </div>
+    </div>
+
+    <div class="grid-4 mb-20">
+      <div class="kpi-card" style="--kpi-color:#00d4aa">
+        <div class="kpi-label">Transactions Reconciled</div>
+        <div class="kpi-value">4,821</div>
+        <div class="kpi-change up">98.2% match rate</div>
+        <div class="kpi-icon">✅</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#ff4455">
+        <div class="kpi-label">Discrepancies Flagged</div>
+        <div class="kpi-value">87</div>
+        <div class="kpi-change down">$1.23M total variance</div>
+        <div class="kpi-icon">🚩</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#ffb800">
+        <div class="kpi-label">Pending Clearance</div>
+        <div class="kpi-value">34</div>
+        <div class="kpi-change warn">Requires approval</div>
+        <div class="kpi-icon">⏳</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#a855f7">
+        <div class="kpi-label">Close Cycle Reduction</div>
+        <div class="kpi-value">-2.4d</div>
+        <div class="kpi-change up">↑ vs manual process</div>
+        <div class="kpi-icon">📅</div>
+      </div>
+    </div>
+
+    <div class="grid-2 mb-20">
+      <!-- TRANSACTION TABLE -->
+      <div class="card">
+        <div class="flex items-center gap-8 mb-16">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;">🔄 Transaction Reconciliation</div>
+          <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="filterTx('all')">All</button>
+          <button class="btn btn-secondary btn-sm" onclick="filterTx('flagged')">Flagged</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>TX ID</th><th>Account</th><th>Expected</th><th>Actual</th><th>Variance</th><th>Status</th></tr></thead>
+            <tbody id="txTable"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- VARIANCE -->
+      <div class="card">
+        <div class="card-title mb-4">📊 Variance Analysis</div>
+        <div class="card-subtitle">Root-cause attributed financial variances</div>
+        <div class="chart-wrap" style="height:200px"><canvas id="varianceChart"></canvas></div>
+        <div class="divider"></div>
+        <div id="varianceTable"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== APPROVALS ===== -->
+  <div class="page" id="page-approvals">
+    <div class="section-header">
+      <div>
+        <div class="section-title">✅ Approval Workflows</div>
+        <div class="section-desc">Enterprise multi-step approval for autonomous agent actions</div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="approveAll()">✅ Approve All Pending</button>
+    </div>
+    <div id="approvalList"></div>
+  </div>
+
+  <!-- ===== PLAYBOOKS ===== -->
+  <div class="page" id="page-playbooks">
+    <div class="section-header">
+      <div>
+        <div class="section-title">📖 Playbooks</div>
+        <div class="section-desc">AI-generated actionable remediation playbooks</div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openModal('playbookModal')">+ Generate Playbook</button>
+    </div>
+    <div id="playbookList"></div>
+  </div>
+
+  <!-- ===== REPORTS ===== -->
+  <div class="page" id="page-reports">
+    <div class="section-header">
+      <div>
+        <div class="section-title">📄 Reports</div>
+        <div class="section-desc">Downloadable financial intelligence reports</div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openModal('exportModal')">📤 Generate Report</button>
+    </div>
+    <div class="grid-3" id="reportList"></div>
+  </div>
+
+  <!-- ===== SETTINGS ===== -->
+  <div class="page" id="page-settings">
+    <div class="section-title mb-20">⚙️ Settings</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title mb-16">🔌 Data Integrations</div>
+        <div id="integrations"></div>
+      </div>
+      <div class="card">
+        <div class="card-title mb-16">🤖 Agent Configuration</div>
+        <div id="agentConfig"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-header">
+    Notifications
+    <button class="btn btn-secondary btn-sm" onclick="clearNotifs()">Clear all</button>
+  </div>
+  <div id="notifList"></div>
+</div>
+
+<!-- CMD PALETTE -->
+<div class="cmd-overlay" id="cmdOverlay" onclick="closeCmd(event)">
+  <div class="cmd-palette">
+    <div class="cmd-input-wrap">
+      <span style="font-size:18px">🔍</span>
+      <input class="cmd-input" id="cmdInput" placeholder="Search agents, pages, actions…" oninput="filterCmd(this.value)"/>
+      <span class="kbd" style="cursor:pointer" onclick="closeCmd()">ESC</span>
+    </div>
+    <div class="cmd-results" id="cmdResults"></div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="exportModal" onclick="closeModal(event,'exportModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📤 Export Report</div>
+      <div class="close-btn" onclick="closeModal(null,'exportModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Select the type of report and format to export</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <div class="rec-card" style="cursor:pointer" onclick="selectExport(this,'Cost Savings Summary')">
+          <div style="font-size:24px mb-8">📊</div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">Cost Savings Summary</div>
+          <div style="font-size:11px;color:var(--text3)">MTD financial impact</div>
+        </div>
+        <div class="rec-card" style="cursor:pointer" onclick="selectExport(this,'Anomaly Report')">
+          <div style="font-size:24px">⚠️</div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">Anomaly Report</div>
+          <div style="font-size:11px;color:var(--text3)">All detected anomalies</div>
+        </div>
+        <div class="rec-card" style="cursor:pointer" onclick="selectExport(this,'SLA Status')">
+          <div style="font-size:24px">📋</div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">SLA Status</div>
+          <div style="font-size:11px;color:var(--text3)">Breach risk & penalties</div>
+        </div>
+        <div class="rec-card" style="cursor:pointer" onclick="selectExport(this,'Full Financial Report')">
+          <div style="font-size:24px">💰</div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">Full Financial Report</div>
+          <div style="font-size:11px;color:var(--text3)">Variance & reconciliation</div>
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text3)">FORMAT</div>
+      <div class="flex gap-8">
+        <button class="btn btn-secondary" onclick="this.parentElement.querySelectorAll('.btn').forEach(b=>b.classList.remove('btn-primary'));this.classList.add('btn-primary')">PDF</button>
+        <button class="btn btn-secondary" onclick="this.parentElement.querySelectorAll('.btn').forEach(b=>b.classList.remove('btn-primary'));this.classList.add('btn-primary')">Excel</button>
+        <button class="btn btn-secondary" onclick="this.parentElement.querySelectorAll('.btn').forEach(b=>b.classList.remove('btn-primary'));this.classList.add('btn-primary')">CSV</button>
+        <button class="btn btn-secondary" onclick="this.parentElement.querySelectorAll('.btn').forEach(b=>b.classList.remove('btn-primary'));this.classList.add('btn-primary')">JSON</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal(null,'exportModal')">Cancel</button>
+      <button class="btn btn-primary export-glow" onclick="doExport()">📤 Export Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="agentModal" onclick="closeModal(event,'agentModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🤖 Run AI Agent</div>
+      <div class="close-btn" onclick="closeModal(null,'agentModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Select which agents to run and their scan scope</p>
+      <div id="agentCheckboxes"></div>
+      <div class="divider"></div>
+      <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:8px">SCAN SCOPE</div>
+      <div class="flex gap-8">
+        <button class="btn btn-secondary btn-sm active-scope" onclick="setScope(this,'Last 7 days')">7D</button>
+        <button class="btn btn-secondary btn-sm" onclick="setScope(this,'Last 30 days')">30D</button>
+        <button class="btn btn-secondary btn-sm" onclick="setScope(this,'Last Quarter')">QTD</button>
+        <button class="btn btn-secondary btn-sm" onclick="setScope(this,'Full Year')">YTD</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal(null,'agentModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="runAgents()">🚀 Run Selected Agents</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="approvalModal" onclick="closeModal(event,'approvalModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">✅ Multi-step Approval</div>
+      <div class="close-btn" onclick="closeModal(null,'approvalModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="badge success mb-12">Resource Consolidation: Slack + Teams Merge</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px">This action will consolidate 3 collaboration tools saving <strong>$18,000/month</strong>. Requires 3-step approval.</p>
+      <div class="formula-box">
+Monthly Saving = (Slack Pro × 340 seats) + (Teams E3 × 120 seats)<br>
+              = $12,580 + $5,640 = $18,220/month<br>
+Annual Impact = $218,640
+      </div>
+      <div id="approvalSteps"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="closeModal(null,'approvalModal')">Reject</button>
+      <button class="btn btn-primary" onclick="approveStep()">✅ Approve & Proceed</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="playbookModal" onclick="closeModal(event,'playbookModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📖 Generate Playbook</div>
+      <div class="close-btn" onclick="closeModal(null,'playbookModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px">AI will generate a step-by-step remediation playbook for the selected anomaly or cost issue.</p>
+      <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:8px">PLAYBOOK TYPE</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+        <div class="rec-card" style="cursor:pointer;padding:12px" onclick="selectPb(this)"><div style="font-size:12px;font-weight:600">🔍 Vendor Rate Renegotiation</div></div>
+        <div class="rec-card" style="cursor:pointer;padding:12px" onclick="selectPb(this)"><div style="font-size:12px;font-weight:600">🔁 Duplicate Invoice Resolution</div></div>
+        <div class="rec-card" style="cursor:pointer;padding:12px" onclick="selectPb(this)"><div style="font-size:12px;font-weight:600">📋 SLA Breach Prevention</div></div>
+        <div class="rec-card" style="cursor:pointer;padding:12px" onclick="selectPb(this)"><div style="font-size:12px;font-weight:600">⚙️ Resource Decommission</div></div>
+      </div>
+      <div id="pbPreview" style="display:none">
+        <div class="divider"></div>
+        <div class="card-title mb-12">Preview: Steps</div>
+        <div class="timeline" id="pbSteps"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal(null,'playbookModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="downloadPlaybook()">📥 Download Playbook</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="slaModal" onclick="closeModal(event,'slaModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🛡️ SLA Prevention Actions</div>
+      <div class="close-btn" onclick="closeModal(null,'slaModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="badge critical mb-12">3 breaches imminent · $840K at risk</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px">The agent recommends the following autonomous actions to prevent financial penalties:</p>
+      <div id="slaActions"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal(null,'slaModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="executeSLAActions()">🚀 Execute All Actions</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="reconcileModal" onclick="closeModal(event,'reconcileModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🔄 Run Reconciliation</div>
+      <div class="close-btn" onclick="closeModal(null,'reconcileModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Select data sources to reconcile for this cycle</p>
+      <div id="reconSources"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal(null,'reconcileModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="runRecon()">🔄 Start Reconciliation</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="userModal" onclick="closeModal(event,'userModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">👤 User Profile</div>
+      <div class="close-btn" onclick="closeModal(null,'userModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="flex items-center gap-16 mb-20">
+        <div class="user-avatar" style="width:64px;height:64px;font-size:24px;border-radius:16px">RK</div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800">Rahul Kapoor</div>
+          <div style="color:var(--text3);font-size:13px">Chief Financial Officer</div>
+          <div class="badge success mt-8">Enterprise Plan</div>
+        </div>
+      </div>
+      <div class="math-row"><span class="text-muted">Email</span><span>rahul.kapoor@enterprise.com</span></div>
+      <div class="math-row"><span class="text-muted">Department</span><span>Finance & Operations</span></div>
+      <div class="math-row"><span class="text-muted">Access Level</span><span class="badge info">Admin</span></div>
+      <div class="math-row"><span class="text-muted">Last Login</span><span>Mar 29, 2026 · 9:14 AM</span></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal(null,'userModal')">Close</button>
+      <button class="btn btn-primary">Edit Profile</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="cellModal" onclick="closeModal(event,'cellModal')">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <div class="modal-title" id="cellModalTitle">Cell Detail</div>
+      <div class="close-btn" onclick="closeModal(null,'cellModal')">✕</div>
+    </div>
+    <div class="modal-body" id="cellModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal(null,'cellModal')">Close</button>
+      <button class="btn btn-primary" onclick="openModal('approvalModal')">📋 Create Optimization Task</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// THEME
+// ============================================================
+let isDark = true;
+function toggleTheme(){
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('themeIcon').textContent = isDark ? '🌙' : '☀️';
+  document.getElementById('themeLabel').textContent = isDark ? 'Dark' : 'Light';
+  document.getElementById('toggleSwitch').classList.toggle('on', isDark);
+  updateChartTheme();
+}
+document.getElementById('toggleSwitch').classList.add('on');
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function navigate(page, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const p = document.getElementById('page-'+page);
+  if(p) p.classList.add('active');
+  if(el) el.classList.add('active');
+  const titles = {dashboard:'Dashboard',analytics:'Analytics & Cost Math',spend:'Spend Intelligence Agent',sla:'SLA & Penalty Prevention',resource:'Resource Optimization Agent',finops:'Financial Operations Agent',approvals:'Approval Workflows',playbooks:'Playbooks',reports:'Reports',settings:'Settings'};
+  document.getElementById('pageTitle').textContent = titles[page] || page;
+  initPageCharts(page);
+}
+
+// ============================================================
+// TICKER
+// ============================================================
+const tickerData = [
+  {label:'Cost Saved MTD',val:'$2.47M',cls:'up'},{label:'Anomalies',val:'143',cls:'down'},
+  {label:'SLA Breach Risk',val:'HIGH',cls:'warn'},{label:'Resources Optimized',val:'89',cls:'up'},
+  {label:'Reconciliation Rate',val:'98.2%',cls:'up'},{label:'Pending Approvals',val:'4',cls:'warn'},
+  {label:'Duplicate Invoices',val:'$318K',cls:'down'},{label:'Vendor Savings Opp.',val:'$1.14M',cls:'up'},
+  {label:'Close Cycle Progress',val:'58%',cls:'up'},{label:'Penalty Exposure',val:'$840K',cls:'down'},
+];
+function buildTicker(){
+  const inner = document.getElementById('tickerInner');
+  // duplicate for seamless loop
+  const all = [...tickerData,...tickerData];
+  inner.innerHTML = all.map(t=>`<div class="ticker-item"><span class="ticker-label">${t.label}</span><span class="ticker-val ${t.cls}">${t.val}</span></div>`).join('');
+}
+buildTicker();
+
+// ============================================================
+// ALERT FEED (Dashboard)
+// ============================================================
+const alerts = [
+  {dot:'#ff4455',title:'Duplicate Invoice Detected: Oracle Cloud',meta:'$42,000 · INV-2024-0847 matches INV-2024-0712',actions:['Resolve','Ignore']},
+  {dot:'#ffb800',title:'SLA Breach Imminent: Logistics Partner A',meta:'Contract value: $1.2M · 4h 30m remaining',actions:['Escalate','Reroute']},
+  {dot:'#ff4455',title:'Vendor Overcharge: AWS Reserved Instances',meta:'$18,340 overcharge on us-east-1 instances',actions:['Dispute','View']},
+  {dot:'#0099ff',title:'Resource Over-provisioned: Salesforce Licenses',meta:'68 unused seats · $8,640/month waste',actions:['Optimize','Snooze']},
+];
+function buildAlertFeed(){
+  const feed = document.getElementById('alertFeed');
+  if(!feed) return;
+  feed.innerHTML = alerts.map((a,i)=>`
+  <div class="alert-item slide-in" style="animation-delay:${i*0.1}s">
+    <div class="alert-dot" style="background:${a.dot}"></div>
+    <div class="alert-body">
+      <div class="alert-title">${a.title}</div>
+      <div class="alert-meta">${a.meta}</div>
+    </div>
+    <div class="alert-actions">
+      ${a.actions.map(ac=>`<button class="btn btn-secondary btn-sm" onclick="handleAlert(this,'${ac}')">${ac}</button>`).join('')}
+    </div>
+  </div>`).join('');
+}
+function handleAlert(btn, action){
+  const item = btn.closest('.alert-item');
+  item.style.opacity='0.4';
+  item.style.pointerEvents='none';
+  showToast(`✅ Action "${action}" executed`);
+}
+buildAlertFeed();
+
+// ============================================================
+// AGENT LOG
+// ============================================================
+const agentLogs = [
+  {icon:'🔍',agent:'Spend Intelligence',action:'Scanned 14,203 invoices',time:'2m ago',badge:'success'},
+  {icon:'📋',agent:'SLA Agent',action:'3 breach risks escalated to FinOps',time:'8m ago',badge:'warning'},
+  {icon:'⚙️',agent:'Resource Optimizer',action:'12 consolidation recs generated',time:'15m ago',badge:'info'},
+  {icon:'💰',agent:'Financial Ops',action:'4,821 transactions reconciled',time:'1h ago',badge:'success'},
+  {icon:'🔍',agent:'Spend Intelligence',action:'Playbook triggered: Vendor-7 renegotiation',time:'2h ago',badge:'info'},
+  {icon:'📋',agent:'SLA Agent',action:'Auto-rerouted 3 workloads to backup',time:'3h ago',badge:'success'},
+];
+function buildAgentLog(){
+  const el = document.getElementById('agentLog');
+  if(!el) return;
+  el.innerHTML = agentLogs.map(l=>`
+  <div class="alert-item" style="padding:10px 14px">
+    <div style="font-size:20px">${l.icon}</div>
+    <div class="alert-body">
+      <div class="alert-title" style="font-size:12px">${l.agent}</div>
+      <div class="alert-meta">${l.action}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <span class="badge ${l.badge}" style="font-size:9px">${l.badge.toUpperCase()}</span>
+      <span class="text-xs text-muted">${l.time}</span>
+    </div>
+  </div>`).join('');
+}
+buildAgentLog();
+
+// ============================================================
+// ANOMALY TABLE
+// ============================================================
+const anomalies = [
+  {id:'ANM-001',vendor:'Oracle Cloud',type:'Duplicate Invoice',amount:'$42,000',detected:'Mar 29',severity:'critical'},
+  {id:'ANM-002',vendor:'AWS',type:'Rate Anomaly',amount:'$18,340',detected:'Mar 29',severity:'critical'},
+  {id:'ANM-003',vendor:'Salesforce',type:'Unused Licenses',amount:'$8,640',detected:'Mar 28',severity:'warning'},
+  {id:'ANM-004',vendor:'Microsoft 365',type:'Over-provisioned',amount:'$4,200',detected:'Mar 28',severity:'warning'},
+  {id:'ANM-005',vendor:'Zoom Enterprise',type:'Duplicate Invoice',amount:'$12,800',detected:'Mar 27',severity:'critical'},
+  {id:'ANM-006',vendor:'SAP S/4HANA',type:'Rate Optimization',amount:'$89,000',detected:'Mar 27',severity:'info'},
+  {id:'ANM-007',vendor:'ServiceNow',type:'Contract Anomaly',amount:'$23,400',detected:'Mar 26',severity:'warning'},
+];
+let anomalyFilter = 'all';
+function buildAnomalyTable(filter='all'){
+  const tbody = document.getElementById('anomalyTable');
+  if(!tbody) return;
+  const data = filter === 'all' ? anomalies : filter === 'critical' ? anomalies.filter(a=>a.severity==='critical') : anomalies.filter(a=>a.type.includes('Duplicate'));
+  tbody.innerHTML = data.map(a=>`<tr>
+    <td class="mono">${a.id}</td>
+    <td><span style="font-weight:600">${a.vendor}</span></td>
+    <td>${a.type}</td>
+    <td class="mono" style="color:var(--danger)">${a.amount}</td>
+    <td class="text-muted text-sm">${a.detected}</td>
+    <td><span class="badge ${a.severity}">${a.severity.toUpperCase()}</span></td>
+    <td><div class="flex gap-8">
+      <button class="btn btn-secondary btn-sm" onclick="openModal('playbookModal')">Playbook</button>
+      <button class="btn btn-danger btn-sm" onclick="flagAnomaly(this)">Flag</button>
+    </div></td>
+  </tr>`).join('');
+}
+function filterAnomaly(f){ anomalyFilter=f; buildAnomalyTable(f); }
+function flagAnomaly(btn){
+  btn.textContent='✅ Flagged';
+  btn.disabled=true;
+  showToast('🚩 Anomaly flagged for review');
+}
+
+// ============================================================
+// DUPLICATE TABLE
+// ============================================================
+const duplicates = [
+  {a:'INV-2024-0847',b:'INV-2024-0712',vendor:'Oracle Cloud',amount:'$42,000',sim:'98.7%'},
+  {a:'INV-2024-1203',b:'INV-2024-1198',vendor:'Zoom',amount:'$12,800',sim:'99.1%'},
+  {a:'INV-2024-0334',b:'INV-2024-0311',vendor:'AWS',amount:'$8,200',sim:'95.4%'},
+  {a:'INV-2024-2041',b:'INV-2024-2037',vendor:'Microsoft',amount:'$4,200',sim:'97.8%'},
+];
+function buildDuplicateTable(){
+  const tbody = document.getElementById('duplicateTable');
+  if(!tbody) return;
+  tbody.innerHTML = duplicates.map(d=>`<tr>
+    <td class="mono">${d.a}</td><td class="mono">${d.b}</td>
+    <td>${d.vendor}</td>
+    <td class="mono" style="color:var(--danger)">${d.amount}</td>
+    <td><span class="badge critical">${d.sim}</span></td>
+    <td><div class="flex gap-8">
+      <button class="btn btn-primary btn-sm" onclick="resolveDup(this)">Resolve</button>
+      <button class="btn btn-secondary btn-sm">Review</button>
+    </div></td>
+  </tr>`).join('');
+}
+function resolveDup(btn){
+  btn.closest('tr').style.opacity='0.4';
+  showToast('✅ Duplicate resolved — $'+(Math.random()*50000|0).toLocaleString()+' recovered');
+}
+
+// ============================================================
+// SLA CARDS
+// ============================================================
+const slaData = [
+  {name:'Logistics Partner A',health:22,risk:'CRITICAL',contract:'$1.2M',window:'4h 30m',color:'#ff4455'},
+  {name:'Cloud Infrastructure SLA',health:58,risk:'WARNING',contract:'$3.4M',window:'18h',color:'#ffb800'},
+  {name:'Data Center Uptime',health:89,risk:'HEALTHY',contract:'$2.1M',window:'6d',color:'#00d4aa'},
+  {name:'ERP Support SLA',health:71,risk:'MODERATE',contract:'$0.8M',window:'2d 4h',color:'#ffb800'},
+  {name:'CDN Performance SLA',health:95,risk:'HEALTHY',contract:'$0.6M',window:'12d',color:'#00d4aa'},
+  {name:'Payment Gateway SLA',health:34,risk:'HIGH RISK',contract:'$2.8M',window:'8h',color:'#ff4455'},
+];
+function buildSLACards(){
+  const el = document.getElementById('slaCards');
+  if(!el) return;
+  el.innerHTML = slaData.map(s=>{
+    const r = 40; const circ = 2*Math.PI*r;
+    const offset = circ - (s.health/100)*circ;
+    const riskBadge = s.risk==='CRITICAL'||s.risk==='HIGH RISK'?'critical':s.risk==='WARNING'||s.risk==='MODERATE'?'warning':'success';
+    return `<div class="card" style="cursor:pointer" onclick="openModal('slaModal')">
+      <div class="flex items-center gap-12 mb-12">
+        <svg width="80" height="80" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--bg4)" stroke-width="10"/>
+          <circle cx="50" cy="50" r="${r}" fill="none" stroke="${s.color}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${offset}" transform="rotate(-90 50 50)" style="transition:stroke-dashoffset 1s ease"/>
+          <text x="50" y="54" text-anchor="middle" font-size="18" font-weight="800" fill="${s.color}" font-family="Syne,sans-serif">${s.health}%</text>
+        </svg>
+        <div>
+          <div style="font-size:13px;font-weight:700">${s.name}</div>
+          <span class="badge ${riskBadge} mt-8">${s.risk}</span>
+        </div>
+      </div>
+      <div class="math-row" style="font-size:12px"><span class="text-muted">Contract Value</span><span>${s.contract}</span></div>
+      <div class="math-row" style="font-size:12px"><span class="text-muted">Time to Window</span><span style="color:${s.color}">${s.window}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// SLA ALERTS
+// ============================================================
+const slaAlerts = [
+  {sev:'critical',title:'Logistics Partner A: 4h 30m to breach',desc:'Reroute 3 pending shipments immediately',actions:['Reroute Work','Escalate','View Contract']},
+  {sev:'critical',title:'Payment Gateway: Response time degrading',desc:'P95 latency 2.8s vs SLA threshold 1.5s',actions:['Shift Traffic','Alert Team','View SLA']},
+  {sev:'warning',title:'Cloud Infra: Uptime trending below threshold',desc:'98.4% uptime — SLA requires 99.5%',actions:['Open Ticket','Failover','Snooze']},
+];
+function buildSLAAlerts(){
+  const el = document.getElementById('slaAlerts');
+  if(!el) return;
+  el.innerHTML = slaAlerts.map(a=>`
+  <div class="alert-item">
+    <div class="alert-dot" style="background:${a.sev==='critical'?'var(--danger)':'var(--warning)'}"></div>
+    <div class="alert-body">
+      <div class="alert-title">${a.title}</div>
+      <div class="alert-meta">${a.desc}</div>
+      <div class="flex gap-8 mt-8">${a.actions.map(ac=>`<button class="btn btn-secondary btn-sm" onclick="handleAlert(this,'${ac}')">${ac}</button>`).join('')}</div>
+    </div>
+  </div>`).join('');
+}
+
+// ============================================================
+// PENALTY CALC
+// ============================================================
+const penalties = [
+  {sla:'Logistics Partner A',contract:'$1.2M',rate:'3%',days:2,exposure:'$72,000'},
+  {sla:'Payment Gateway SLA',contract:'$2.8M',rate:'5%',days:1,exposure:'$140,000'},
+  {sla:'Cloud Infra SLA',contract:'$3.4M',rate:'2%',days:3,exposure:'$204,000'},
+  {sla:'ERP Support SLA',contract:'$0.8M',rate:'4%',days:5,exposure:'$160,000'},
+  {sla:'Data Center Uptime',contract:'$2.1M',rate:'3%',days:1,exposure:'$63,000'},
+];
+function buildPenaltyCalc(){
+  const el = document.getElementById('penaltyCalc');
+  if(!el) return;
+  el.innerHTML = penalties.map(p=>`
+  <div class="math-row" style="font-size:12px">
+    <span>${p.sla}</span>
+    <div class="flex items-center gap-8">
+      <span class="mono text-muted">${p.contract} × ${p.rate} × ${p.days}d</span>
+      <span class="mono" style="color:var(--danger)">${p.exposure}</span>
+    </div>
+  </div>`).join('');
+}
+
+// ============================================================
+// SLA ACTIONS (Modal)
+// ============================================================
+const slaActionList = [
+  {icon:'🔄',title:'Reroute Logistics Shipments',desc:'Redirect 3 pending shipments to Backup Partner B',saving:'Prevents $72,000 penalty'},
+  {icon:'⚡',title:'Shift CDN Traffic',desc:'Failover 40% traffic to secondary CDN nodes',saving:'Prevents $140,000 penalty'},
+  {icon:'📧',title:'Escalate to VP Operations',desc:'Auto-send breach warning with root cause report',saving:'Triggers SLA grace period'},
+  {icon:'🔧',title:'Scale Cloud Infrastructure',desc:'Auto-provision 200 additional compute units',saving:'Restores 99.5% uptime compliance'},
+];
+function buildSLAActions(){
+  const el = document.getElementById('slaActions');
+  if(!el) return;
+  el.innerHTML = slaActionList.map((a,i)=>`
+  <div class="rec-card">
+    <div class="rec-header">
+      <div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">${a.icon}</span><div class="rec-title">${a.title}</div></div>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--accent)"/><span class="text-sm">Include</span></label>
+    </div>
+    <div class="rec-desc">${a.desc}</div>
+    <div class="badge success">${a.saving}</div>
+  </div>`).join('');
+}
+
+// ============================================================
+// HEATMAP
+// ============================================================
+const tools = ['Slack','Salesforce','AWS','Jira','Zoom','SAP','ServiceNow','Teams'];
+const teams = ['Engineering','Finance','HR','Sales','Legal','Ops'];
+function buildHeatmap(){
+  const el = document.getElementById('heatmap');
+  const labels = document.getElementById('heatmapLabels');
+  if(!el) return;
+  el.style.gridTemplateColumns = `repeat(${tools.length},1fr)`;
+  if(labels) labels.innerHTML = tools.map(t=>`<span style="font-size:10px;color:var(--text3);text-align:center;flex:1">${t}</span>`).join('');
+  let html = '';
+  teams.forEach(team=>{
+    tools.forEach(tool=>{
+      const val = Math.floor(Math.random()*100);
+      const alpha = 0.1 + (val/100)*0.9;
+      const col = val < 30 ? `rgba(255,68,85,${alpha})` : val < 60 ? `rgba(255,184,0,${alpha})` : `rgba(0,212,170,${alpha})`;
+      html += `<div class="hm-cell" style="background:${col};color:${val<30?'#ff4455':val<60?'#ffb800':'#00d4aa'}" onclick="showCellDetail('${team}','${tool}',${val})">${val}%<div class="tooltip">${team} · ${tool}<br>${val}% utilization</div></div>`;
+    });
+  });
+  el.innerHTML = html;
+}
+function showCellDetail(team,tool,val){
+  document.getElementById('cellModalTitle').textContent = `${team} — ${tool}`;
+  document.getElementById('cellModalBody').innerHTML = `
+  <div class="badge ${val<30?'critical':val<60?'warning':'success'} mb-12">${val}% Utilization</div>
+  <div class="math-row"><span>Team</span><span>${team}</span></div>
+  <div class="math-row"><span>Tool</span><span>${tool}</span></div>
+  <div class="math-row"><span>Utilization</span><span class="mono">${val}%</span></div>
+  <div class="math-row"><span>Seats Active</span><span class="mono">${Math.floor(val*1.2)} / ${Math.floor(val*1.2/val*100)}</span></div>
+  <div class="math-row"><span>Monthly Cost</span><span class="mono" style="color:var(--danger)">$${(Math.floor(Math.random()*20+5)*1000).toLocaleString()}</span></div>
+  ${val<50?`<div class="formula-box mt-12">Potential Saving = (1 - ${val/100}) × Monthly Cost<br>= ${((1-val/100)*100).toFixed(0)}% reduction opportunity</div>`:'<div class="formula-box mt-12" style="border-color:var(--accent)">✅ Healthy utilization — No action needed</div>'}`;
+  openModal('cellModal');
+}
+
+// ============================================================
+// RECOMMENDATIONS
+// ============================================================
+const recs = [
+  {title:'Consolidate Slack + Teams',desc:'Both tools used for collaboration. Standardize on one to eliminate redundancy and reduce license costs.',saving:'$18,220/mo',effort:'Low',approved:false},
+  {title:'Right-size AWS EC2 Instances',desc:'34 instances running at <15% CPU utilization. Downsize or switch to Spot/Reserved instances.',saving:'$12,400/mo',effort:'Medium',approved:false},
+  {title:'Terminate Unused Salesforce Seats',desc:'68 licensed seats have had zero logins in 90 days. Immediate deactivation recommended.',saving:'$8,640/mo',effort:'Low',approved:true},
+  {title:'Consolidate BI Tools (Tableau + Power BI)',desc:'Both tools used across departments for identical reporting functions.',saving:'$9,800/mo',effort:'High',approved:false},
+];
+function buildRecCards(){
+  const el = document.getElementById('recCards');
+  if(!el) return;
+  el.innerHTML = recs.map((r,i)=>`
+  <div class="rec-card" id="rec${i}">
+    <div class="rec-header">
+      <div class="rec-title">${r.title}</div>
+      <div class="rec-saving">${r.saving}</div>
+    </div>
+    <div class="rec-desc">${r.desc}</div>
+    <div class="flex items-center gap-8">
+      <span class="badge ${r.effort==='Low'?'success':r.effort==='Medium'?'warning':'critical'}">${r.effort} Effort</span>
+      <div class="rec-actions" style="margin-left:auto">
+        ${r.approved?`<span class="badge success">✅ Approved</span>`:`
+        <button class="btn btn-primary btn-sm" onclick="approveRec(${i},this)">✅ Approve</button>
+        <button class="btn btn-danger btn-sm" onclick="rejectRec(${i},this)">✗ Reject</button>`}
+      </div>
+    </div>
+  </div>`).join('');
+}
+function approveRec(i,btn){
+  btn.closest('.rec-actions').innerHTML = `<span class="badge success">✅ Approved — Executing</span>`;
+  showToast(`✅ Recommendation approved · ${recs[i].saving} saving queued`);
+  addToApprovals(recs[i]);
+}
+function rejectRec(i,btn){
+  btn.closest('.rec-card').style.opacity='0.4';
+  showToast(`✗ Recommendation rejected`);
+}
+
+// ============================================================
+// TEAM ALLOCATION
+// ============================================================
+const teams2 = [
+  {name:'Engineering',util:78,seats:120},{name:'Finance',util:45,seats:40},
+  {name:'Sales',util:91,seats:80},{name:'HR',util:32,seats:25},
+  {name:'Operations',util:67,seats:60},{name:'Legal',util:22,seats:15},
+];
+function buildTeamAllocation(){
+  const el = document.getElementById('teamAllocation');
+  if(!el) return;
+  el.innerHTML = teams2.map(t=>`
+  <div style="margin-bottom:12px">
+    <div class="flex items-center gap-8 mb-4">
+      <span style="font-size:12px;font-weight:600;">${t.name}</span>
+      <span class="mono text-sm" style="margin-left:auto;color:${t.util<40?'var(--danger)':t.util>80?'var(--accent)':'var(--warning)'}">${t.util}%</span>
+      <span class="text-xs text-muted">${t.seats} seats</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" style="width:${t.util}%;background:${t.util<40?'var(--danger)':t.util>80?'var(--accent)':'var(--warning)'}"></div></div>
+  </div>`).join('');
+}
+
+// ============================================================
+// CHANGE LOG
+// ============================================================
+const changeLogs = [
+  {action:'Deactivated 68 Salesforce seats',by:'Resource Agent',time:'10m ago',status:'success'},
+  {action:'Rightsized 12 EC2 t3.xlarge → t3.small',by:'Resource Agent',time:'1h ago',status:'success'},
+  {action:'Slack consolidation pending CFO approval',by:'Resource Agent',time:'2h ago',status:'warning'},
+];
+function buildChangeLog(){
+  const el = document.getElementById('changeLog');
+  if(!el) return;
+  el.innerHTML = changeLogs.map(c=>`
+  <div class="alert-item" style="padding:10px 12px">
+    <div class="alert-dot" style="background:${c.status==='success'?'var(--accent)':'var(--warning)'}"></div>
+    <div class="alert-body">
+      <div class="alert-title" style="font-size:12px">${c.action}</div>
+      <div class="alert-meta">${c.by} · ${c.time}</div>
+    </div>
+  </div>`).join('');
+}
+
+// ============================================================
+// TRANSACTIONS
+// ============================================================
+const transactions = [
+  {id:'TX-84721',acc:'Cost Center 1040',expected:'$124,500',actual:'$124,500',var:'$0',status:'success'},
+  {id:'TX-84722',acc:'Vendor Payments',expected:'$42,000',actual:'$84,000',var:'+$42,000',status:'critical'},
+  {id:'TX-84723',acc:'Infrastructure',expected:'$89,200',actual:'$91,840',var:'+$2,640',status:'warning'},
+  {id:'TX-84724',acc:'Payroll',expected:'$320,000',actual:'$320,000',var:'$0',status:'success'},
+  {id:'TX-84725',acc:'Marketing Ops',expected:'$18,400',actual:'$14,200',var:'-$4,200',status:'success'},
+  {id:'TX-84726',acc:'SaaS Licenses',expected:'$28,600',actual:'$34,800',var:'+$6,200',status:'warning'},
+];
+let txFilter='all';
+function buildTxTable(filter='all'){
+  const tbody = document.getElementById('txTable');
+  if(!tbody) return;
+  const data = filter==='all' ? transactions : transactions.filter(t=>t.status!=='success');
+  tbody.innerHTML = data.map(t=>`<tr>
+    <td class="mono">${t.id}</td>
+    <td>${t.acc}</td>
+    <td class="mono">${t.expected}</td>
+    <td class="mono">${t.actual}</td>
+    <td class="mono ${t.var.startsWith('+')?' var-positive':t.var.startsWith('-')?' var-negative':''}">${t.var}</td>
+    <td><span class="badge ${t.status}">${t.status==='success'?'✅ Matched':t.status==='critical'?'🚨 Flagged':'⚠️ Review'}</span></td>
+  </tr>`).join('');
+}
+function filterTx(f){ txFilter=f; buildTxTable(f); }
+
+// ============================================================
+// VARIANCE TABLE
+// ============================================================
+const variances = [
+  {category:'Vendor Duplicate',amount:'+$42,000',cause:'Invoice processing error',impact:'High'},
+  {category:'Infrastructure Over-spend',amount:'+$2,640',cause:'Unplanned EC2 scale-out event',impact:'Medium'},
+  {category:'License Optimization',amount:'-$4,200',cause:'Agent deactivated unused seats',impact:'Positive'},
+  {category:'SaaS Contracts',amount:'+$6,200',cause:'Annual price increase clause triggered',impact:'Medium'},
+];
+function buildVarianceTable(){
+  const el = document.getElementById('varianceTable');
+  if(!el) return;
+  el.innerHTML = variances.map(v=>`
+  <div class="math-row" style="font-size:12px">
+    <div>
+      <div style="font-weight:600">${v.category}</div>
+      <div class="text-muted text-xs">${v.cause}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="badge ${v.impact==='Positive'?'success':v.impact==='High'?'critical':'warning'}">${v.impact}</span>
+      <span class="mono" style="color:${v.amount.startsWith('+') ? 'var(--danger)' : 'var(--accent)'}">${v.amount}</span>
+    </div>
+  </div>`).join('');
+}
+
+// ============================================================
+// APPROVALS PAGE
+// ============================================================
+const approvalsData = [
+  {title:'Consolidate Slack + Microsoft Teams',agent:'Resource Optimizer',saving:'$218,640/yr',impact:'High',steps:['Finance Review','IT Security','CFO Approval'],currentStep:1},
+  {title:'Renegotiate Oracle Cloud Contract',agent:'Spend Intelligence',saving:'$142,000/yr',impact:'High',steps:['Procurement Review','Legal Review','VP Sign-off'],currentStep:0},
+  {title:'Decommission 34 EC2 Instances',agent:'Resource Optimizer',saving:'$148,800/yr',impact:'Medium',steps:['Engineering Review','Finance Approval'],currentStep:0},
+  {title:'Resolve 23 Duplicate Invoices',agent:'Spend Intelligence',saving:'$318,000 recovery',impact:'Critical',steps:['AP Review','CFO Approval'],currentStep:1},
+];
+function buildApprovals(){
+  const el = document.getElementById('approvalList');
+  if(!el) return;
+  el.innerHTML = approvalsData.map((a,ai)=>`
+  <div class="card mb-16">
+    <div class="flex items-center gap-12 mb-16">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700">${a.title}</div>
+        <div class="text-muted text-sm mt-8">${a.agent} Agent · <span style="color:var(--accent)">${a.saving}</span></div>
+      </div>
+      <span class="badge ${a.impact==='Critical'?'critical':a.impact==='High'?'warning':'info'}" style="margin-left:auto">${a.impact} Priority</span>
+    </div>
+    <div id="approvalStepsPage${ai}">
+    ${a.steps.map((s,si)=>`
+    <div class="approval-step">
+      <div class="step-num ${si<a.currentStep?'done':si===a.currentStep?'active':''}">${si<a.currentStep?'✓':si+1}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${s}</div>
+        <div class="text-xs text-muted">${si<a.currentStep?'Completed':'Pending'}</div>
+      </div>
+      ${si===a.currentStep?`<div class="flex gap-8">
+        <button class="btn btn-primary btn-sm" onclick="approvePageStep(${ai},${si})">✅ Approve</button>
+        <button class="btn btn-danger btn-sm">✗ Reject</button>
+      </div>`:''}
+    </div>`).join('')}
+    </div>
+  </div>`).join('');
+}
+function approvePageStep(ai,si){
+  approvalsData[ai].currentStep++;
+  if(approvalsData[ai].currentStep >= approvalsData[ai].steps.length){
+    showToast(`🎉 "${approvalsData[ai].title}" fully approved & executing!`);
+  } else {
+    showToast(`✅ Step approved — moving to next reviewer`);
+  }
+  buildApprovals();
+}
+function approveAll(){
+  approvalsData.forEach(a=>a.currentStep=a.steps.length);
+  buildApprovals();
+  showToast('🎉 All pending approvals approved!');
+}
+function addToApprovals(rec){
+  approvalsData.unshift({title:rec.title,agent:'Resource Optimizer',saving:rec.saving,impact:'Medium',steps:['Finance Review','CFO Approval'],currentStep:0});
+  showToast('📋 Added to approval queue');
+}
+
+// ============================================================
+// PLAYBOOKS
+// ============================================================
+const pbData = [
+  {title:'Vendor Rate Renegotiation: Oracle',agent:'Spend Intelligence',created:'Mar 29',steps:6,status:'active',saving:'$89,000'},
+  {title:'Duplicate Invoice Resolution',agent:'Spend Intelligence',created:'Mar 28',steps:4,status:'completed',saving:'$318,000'},
+  {title:'AWS Right-sizing Initiative',agent:'Resource Optimizer',created:'Mar 27',steps:8,status:'active',saving:'$148,800'},
+  {title:'SLA Breach Prevention: Logistics',agent:'SLA Agent',created:'Mar 26',steps:5,status:'completed',saving:'$72,000'},
+  {title:'Salesforce License Cleanup',agent:'Resource Optimizer',created:'Mar 25',steps:3,status:'completed',saving:'$103,680'},
+  {title:'BI Tool Consolidation',agent:'Resource Optimizer',created:'Mar 24',steps:7,status:'draft',saving:'$117,600'},
+];
+function buildPlaybooks(){
+  const el = document.getElementById('playbookList');
+  if(!el) return;
+  el.innerHTML = `<div class="grid-3">${pbData.map(p=>`
+  <div class="card" style="cursor:pointer" onclick="showPbDetail('${p.title}')">
+    <div class="flex items-center gap-8 mb-12">
+      <span style="font-size:24px">📖</span>
+      <span class="badge ${p.status==='active'?'info':p.status==='completed'?'success':'warning'}">${p.status.toUpperCase()}</span>
+    </div>
+    <div style="font-size:14px;font-weight:700;margin-bottom:4px">${p.title}</div>
+    <div class="text-muted text-sm mb-12">${p.agent} · ${p.created} · ${p.steps} steps</div>
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--accent)">${p.saving}</div>
+    <div class="text-xs text-muted">savings identified</div>
+    <div class="flex gap-8 mt-12">
+      <button class="btn btn-primary btn-sm w-full" style="justify-content:center" onclick="downloadPlaybook(event,'${p.title}')">📥 Download</button>
+    </div>
+  </div>`).join('')}</div>`;
+}
+function selectPb(card){
+  document.querySelectorAll('#playbookModal .rec-card').forEach(c=>c.style.borderColor='var(--border)');
+  card.style.borderColor='var(--accent)';
+  document.getElementById('pbPreview').style.display='block';
+  const steps = ['Identify root cause & quantify impact','Gather vendor contract terms and rate benchmarks','Prepare negotiation brief with data','Schedule vendor call via integrated calendar','Execute negotiation and document outcome','Trigger downstream workflow: update PO system'];
+  document.getElementById('pbSteps').innerHTML = steps.map((s,i)=>`<div class="tl-item"><div class="tl-dot ${i>2?'pending':''}"></div><div class="tl-label">Step ${i+1}: ${s}</div></div>`).join('');
+}
+function downloadPlaybook(e,title){
+  if(e) e.stopPropagation();
+  showToast(`📥 Playbook "${title||'selected'}" downloading as PDF`);
+  closeModal(null,'playbookModal');
+}
+
+// ============================================================
+// REPORTS
+// ============================================================
+const reportData = [
+  {title:'Monthly Cost Savings Report',desc:'Full breakdown of AI-attributed savings for March 2026',icon:'📊',size:'2.4 MB',date:'Mar 29'},
+  {title:'Q1 2026 Anomaly Summary',desc:'143 anomalies detected, $2.47M recovered',icon:'⚠️',size:'1.8 MB',date:'Mar 29'},
+  {title:'SLA Breach Risk Assessment',desc:'6 SLAs monitored, $840K penalty prevented',icon:'📋',size:'1.2 MB',date:'Mar 28'},
+  {title:'Resource Utilization Report',desc:'89 resources optimized, $61K monthly saving',icon:'⚙️',size:'3.1 MB',date:'Mar 28'},
+  {title:'Transaction Reconciliation',desc:'4,821 transactions, 98.2% match rate',icon:'💰',size:'4.7 MB',date:'Mar 28'},
+  {title:'Vendor Rate Benchmark',desc:'Comparative analysis of 34 vendor contracts',icon:'🏢',size:'2.0 MB',date:'Mar 27'},
+];
+function buildReports(){
+  const el = document.getElementById('reportList');
+  if(!el) return;
+  el.innerHTML = reportData.map(r=>`
+  <div class="card" style="cursor:pointer">
+    <div style="font-size:32px mb-12">${r.icon}</div>
+    <div style="font-size:14px;font-weight:700;margin-top:12px;margin-bottom:6px">${r.title}</div>
+    <div class="text-muted text-sm mb-16">${r.desc}</div>
+    <div class="flex items-center gap-8">
+      <span class="text-xs text-muted">${r.date} · ${r.size}</span>
+      <div class="flex gap-8" style="margin-left:auto">
+        <button class="btn btn-secondary btn-sm" onclick="showToast('👁 Previewing report')">Preview</button>
+        <button class="btn btn-primary btn-sm" onclick="showToast('📥 Downloading ${r.title}')">📥</button>
+      </div>
+    </div>
+  </div>`).join('');
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+const intgrations = [
+  {name:'SAP S/4HANA',status:true,icon:'🏭'},{name:'Oracle Cloud',status:true,icon:'☁️'},
+  {name:'AWS Cost Explorer',status:true,icon:'📊'},{name:'Salesforce CRM',status:true,icon:'💼'},
+  {name:'ServiceNow',status:false,icon:'🔧'},{name:'Workday HCM',status:false,icon:'👥'},
+];
+function buildSettings(){
+  const el = document.getElementById('integrations');
+  const ac = document.getElementById('agentConfig');
+  if(!el) return;
+  el.innerHTML = intgrations.map(i=>`
+  <div class="flex items-center gap-12" style="padding:12px 0;border-bottom:1px solid var(--border)">
+    <span style="font-size:20px">${i.icon}</span>
+    <span style="font-size:13px;font-weight:600;flex:1">${i.name}</span>
+    <span class="badge ${i.status?'success':'warning'}">${i.status?'Connected':'Disconnected'}</span>
+    <button class="btn btn-secondary btn-sm" onclick="showToast('${i.status?'Configuring':'Connecting'} ${i.name}...')">${i.status?'Configure':'Connect'}</button>
+  </div>`).join('');
+  if(ac) ac.innerHTML = ['Spend Intelligence','SLA Agent','Resource Optimizer','Financial Ops'].map((a,i)=>`
+  <div class="flex items-center gap-12" style="padding:12px 0;border-bottom:1px solid var(--border)">
+    <span style="font-size:13px;font-weight:600;flex:1">${a}</span>
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+      <input type="checkbox" checked style="accent-color:var(--accent)"/>
+      <span class="text-sm">Auto-run</span>
+    </label>
+    <select style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;color:var(--text)">
+      <option>Every 15min</option><option>Every 1hr</option><option>Every 6hr</option>
+    </select>
+  </div>`).join('');
+}
+
+// ============================================================
+// AGENT CHECKBOXES (Modal)
+// ============================================================
+function buildAgentCheckboxes(){
+  const el = document.getElementById('agentCheckboxes');
+  if(!el) return;
+  const agents = [
+    {name:'Spend Intelligence Agent',icon:'🔍',desc:'Scan procurement & vendor data'},
+    {name:'SLA & Penalty Prevention',icon:'📋',desc:'Monitor SLA breach signals'},
+    {name:'Resource Optimizer',icon:'⚙️',desc:'Analyze tool & infra utilization'},
+    {name:'Financial Ops Agent',icon:'💰',desc:'Reconcile transactions'},
+  ];
+  el.innerHTML = agents.map(a=>`
+  <label class="rec-card" style="cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:10px">
+    <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px"/>
+    <span style="font-size:20px">${a.icon}</span>
+    <div>
+      <div style="font-size:13px;font-weight:600">${a.name}</div>
+      <div class="text-xs text-muted">${a.desc}</div>
+    </div>
+  </label>`).join('');
+}
+
+// ============================================================
+// APPROVAL STEPS (Modal)
+// ============================================================
+let currentApprovalStep = 0;
+function buildApprovalSteps(){
+  const el = document.getElementById('approvalSteps');
+  if(!el) return;
+  const steps = [{label:'Finance Review',desc:'Validate cost savings calculation'},{label:'IT Security Review',desc:'Confirm no security implications'},{label:'CFO Approval',desc:'Final executive sign-off'}];
+  el.innerHTML = steps.map((s,i)=>`
+  <div class="approval-step">
+    <div class="step-num ${i<currentApprovalStep?'done':i===currentApprovalStep?'active':''}">${i<currentApprovalStep?'✓':i+1}</div>
+    <div>
+      <div style="font-size:13px;font-weight:600">${s.label}</div>
+      <div class="text-xs text-muted">${s.desc}</div>
+    </div>
+    <span class="badge ${i<currentApprovalStep?'success':i===currentApprovalStep?'info':'warning'}" style="margin-left:auto">${i<currentApprovalStep?'Approved':i===currentApprovalStep?'Current':'Pending'}</span>
+  </div>`).join('');
+}
+function approveStep(){
+  currentApprovalStep++;
+  if(currentApprovalStep>=3){
+    showToast('🎉 Fully approved! Change execution initiated.');
+    closeModal(null,'approvalModal');
+    currentApprovalStep=0;
+  } else {
+    buildApprovalSteps();
+    showToast('✅ Step approved · Moving to next reviewer');
+  }
+}
+
+// ============================================================
+// RECON SOURCES
+// ============================================================
+function buildReconSources(){
+  const el = document.getElementById('reconSources');
+  if(!el) return;
+  const sources = ['SAP General Ledger','Oracle Accounts Payable','Bank Statements (SWIFT)','Credit Card Statements','PO System (Ariba)','Expense Reports (Concur)'];
+  el.innerHTML = sources.map(s=>`
+  <label style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer">
+    <input type="checkbox" checked style="accent-color:var(--accent)"/>
+    <span style="font-size:13px">${s}</span>
+  </label>`).join('');
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+const notifData = [
+  {icon:'🚨',bg:'rgba(255,68,85,0.1)',title:'Critical: Duplicate Invoice $42K',desc:'Oracle Cloud · INV-2024-0847',time:'2m ago'},
+  {icon:'⚠️',bg:'rgba(255,184,0,0.1)',title:'SLA breach imminent: Logistics A',desc:'4h 30m remaining · $72K at risk',time:'8m ago'},
+  {icon:'✅',bg:'rgba(0,212,170,0.1)',title:'Resource optimization approved',desc:'68 Salesforce seats deactivated',time:'15m ago'},
+  {icon:'📊',bg:'rgba(0,153,255,0.1)',title:'Monthly report ready to download',desc:'March 2026 Cost Intelligence Report',time:'1h ago'},
+  {icon:'💡',bg:'rgba(168,85,247,0.1)',title:'New optimization opportunity',desc:'$89K vendor rate renegotiation',time:'2h ago'},
+];
+function buildNotifs(){
+  const el = document.getElementById('notifList');
+  if(!el) return;
+  el.innerHTML = notifData.map(n=>`
+  <div class="notif-item">
+    <div class="notif-icon" style="background:${n.bg}">${n.icon}</div>
+    <div class="notif-content">
+      <div class="notif-title">${n.title}</div>
+      <div class="notif-desc">${n.desc}</div>
+      <div class="notif-time">${n.time}</div>
+    </div>
+  </div>`).join('');
+}
+function clearNotifs(){
+  document.getElementById('notifList').innerHTML = '<div class="empty-state"><div class="empty-icon">🔔</div><div>No new notifications</div></div>';
+}
+
+// ============================================================
+// CMD PALETTE
+// ============================================================
+const cmdItems = [
+  {icon:'🏠',label:'Dashboard',desc:'Go to command center',action:()=>navigate('dashboard',document.querySelectorAll('.nav-item')[0])},
+  {icon:'📊',label:'Analytics',desc:'View cost math & analytics',action:()=>navigate('analytics',document.querySelectorAll('.nav-item')[1])},
+  {icon:'🔍',label:'Spend Intelligence',desc:'View anomalies & vendor data',action:()=>navigate('spend',document.querySelectorAll('.nav-item')[3])},
+  {icon:'📋',label:'SLA & Penalty',desc:'Monitor SLA breaches',action:()=>navigate('sla',document.querySelectorAll('.nav-item')[4])},
+  {icon:'⚙️',label:'Resource Optimizer',desc:'View utilization & recommendations',action:()=>navigate('resource',document.querySelectorAll('.nav-item')[5])},
+  {icon:'💰',label:'Financial Ops',desc:'Reconciliation & variance',action:()=>navigate('finops',document.querySelectorAll('.nav-item')[6])},
+  {icon:'✅',label:'Approvals',desc:'Review pending approvals',action:()=>navigate('approvals',document.querySelectorAll('.nav-item')[8])},
+  {icon:'📖',label:'Playbooks',desc:'View & download playbooks',action:()=>navigate('playbooks',document.querySelectorAll('.nav-item')[9])},
+  {icon:'📤',label:'Export Report',desc:'Export financial reports',action:()=>openModal('exportModal')},
+  {icon:'🤖',label:'Run AI Agent',desc:'Trigger agent scan',action:()=>openModal('agentModal')},
+  {icon:'🌙',label:'Toggle Theme',desc:'Switch light/dark mode',action:toggleTheme},
+];
+let cmdFiltered = [...cmdItems];
+function filterCmd(q){
+  const lower = q.toLowerCase();
+  cmdFiltered = q ? cmdItems.filter(i=>i.label.toLowerCase().includes(lower)||i.desc.toLowerCase().includes(lower)) : [...cmdItems];
+  renderCmd();
+}
+function renderCmd(){
+  const el = document.getElementById('cmdResults');
+  if(!el) return;
+  el.innerHTML = (cmdFiltered.length===0 ? '<div style="padding:20px;text-align:center;color:var(--text3)">No results found</div>' :
+    `<div class="cmd-section-label">Actions</div>` + cmdFiltered.map((c,i)=>`
+    <div class="cmd-item" onclick="execCmd(${i})">
+      <div class="cmd-item-icon">${c.icon}</div>
+      <div><div class="cmd-item-label">${c.label}</div><div class="cmd-item-desc">${c.desc}</div></div>
+    </div>`).join(''));
+}
+function execCmd(i){
+  closeCmd();
+  cmdFiltered[i].action();
+}
+function openCmd(){
+  document.getElementById('cmdOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('cmdInput').focus(),100);
+  renderCmd();
+}
+function closeCmd(e){
+  if(e && e.target!==document.getElementById('cmdOverlay')) return;
+  document.getElementById('cmdOverlay').classList.remove('open');
+  document.getElementById('cmdInput').value='';
+  filterCmd('');
+}
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openCmd();}
+  if(e.key==='Escape'){closeCmd();}
+});
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='approvalModal') buildApprovalSteps();
+  if(id==='agentModal') buildAgentCheckboxes();
+  if(id==='slaModal') buildSLAActions();
+  if(id==='reconSources') buildReconSources();
+  if(id==='reconcileModal') buildReconSources();
+}
+function closeModal(e,id){
+  if(e && e.target!==document.getElementById(id)) return;
+  document.getElementById(id).classList.remove('open');
+}
+
+// ============================================================
+// NOTIFICATIONS PANEL
+// ============================================================
+let notifOpen = false;
+function toggleNotif(){
+  notifOpen = !notifOpen;
+  document.getElementById('notifPanel').classList.toggle('open',notifOpen);
+}
+document.addEventListener('click',e=>{
+  if(notifOpen && !e.target.closest('#notifPanel') && !e.target.closest('#notifBtn')){
+    notifOpen=false;
+    document.getElementById('notifPanel').classList.remove('open');
+  }
+});
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg){
+  const t = document.createElement('div');
+  t.style.cssText = `position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:14px 18px;font-size:13px;font-weight:500;z-index:9999;box-shadow:var(--card-shadow);animation:slideIn 0.3s ease;max-width:360px;`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(()=>t.remove(),300);},3000);
+}
+
+// ============================================================
+// MISC ACTIONS
+// ============================================================
+function simulateRefresh(btn){
+  btn.style.animation='spin 0.6s linear';
+  btn.style.setProperty('--rotation','360deg');
+  setTimeout(()=>{btn.style.animation='';showToast('🔄 Data refreshed successfully');},600);
+}
+function runSpendScan(){
+  showToast('🔍 Spend Intelligence scan initiated — scanning 14,203 records…');
+  setTimeout(()=>showToast('✅ Scan complete · 7 new anomalies detected'),2500);
+}
+function runResourceScan(){
+  showToast('⚙️ Resource analysis running — checking 340 resources…');
+  setTimeout(()=>showToast('✅ Analysis complete · 12 optimization opportunities found'),2200);
+}
+function runAgents(){
+  closeModal(null,'agentModal');
+  showToast('🚀 Selected agents executing — results in ~90 seconds');
+}
+function runRecon(){
+  closeModal(null,'reconcileModal');
+  showToast('🔄 Reconciliation started — processing 4,821+ transactions');
+  setTimeout(()=>showToast('✅ Reconciliation complete · 87 discrepancies flagged'),3000);
+}
+function executeSLAActions(){
+  closeModal(null,'slaModal');
+  showToast('🛡️ All SLA prevention actions executing — $840K penalty risk mitigated');
+}
+function doExport(){
+  closeModal(null,'exportModal');
+  showToast('📥 Report generating & downloading…');
+}
+function selectExport(card, title){
+  document.querySelectorAll('#exportModal .rec-card').forEach(c=>c.style.borderColor='var(--border)');
+  card.style.borderColor='var(--accent)';
+}
+function setTab(el, group){
+  el.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+function setScope(btn, label){
+  btn.closest('div').querySelectorAll('.btn').forEach(b=>b.classList.remove('btn-primary'));
+  btn.classList.add('btn-primary');
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+const chartInstances = {};
+function getChartDefaults(){
+  return {
+    color: isDark ? '#8b94a8' : '#6b7280',
+    gridColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+    bg: isDark ? '#111318' : '#ffffff',
+  };
+}
+function initPageCharts(page){
+  if(page==='dashboard') initDashboardCharts();
+  else if(page==='analytics') initAnalyticsCharts();
+  else if(page==='spend') initSpendCharts();
+  else if(page==='sla') initSLAChart();
+  else if(page==='finops') initFinopsCharts();
+}
+function makeChart(id, config){
+  const canvas = document.getElementById(id);
+  if(!canvas) return;
+  if(chartInstances[id]) chartInstances[id].destroy();
+  const {color,gridColor} = getChartDefaults();
+  const defaultOpts = {
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color,font:{family:"'DM Sans', sans-serif",size:11}}}},
+    scales:config.type!=='pie'&&config.type!=='doughnut'?{
+      x:{grid:{color:gridColor},ticks:{color,font:{size:10}}},
+      y:{grid:{color:gridColor},ticks:{color,font:{size:10}}},
+    }:undefined
+  };
+  config.options = {...defaultOpts,...(config.options||{})};
+  chartInstances[id] = new Chart(canvas.getContext('2d'), config);
+}
+function updateChartTheme(){
+  Object.keys(chartInstances).forEach(id=>{
+    const c = chartInstances[id];
+    if(!c) return;
+    const {color,gridColor} = getChartDefaults();
+    try{
+      c.options.plugins.legend.labels.color=color;
+      if(c.options.scales){
+        Object.values(c.options.scales).forEach(s=>{if(s.ticks)s.ticks.color=color;if(s.grid)s.grid.color=gridColor;});
+      }
+      c.update();
+    }catch(e){}
+  });
+}
+function initDashboardCharts(){
+  makeChart('savingsChart',{type:'bar',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[
+    {label:'Spend Intelligence',data:[820,940,1100,1240,1380,1470],backgroundColor:'rgba(0,212,170,0.7)',borderRadius:6},
+    {label:'SLA Prevention',data:[210,280,350,420,520,840],backgroundColor:'rgba(255,184,0,0.7)',borderRadius:6},
+    {label:'Resource Opt.',data:[180,220,280,340,420,610],backgroundColor:'rgba(0,153,255,0.7)',borderRadius:6},
+  ]}});
+  makeChart('anomalyChart',{type:'doughnut',data:{labels:['Duplicate Invoices','Rate Anomaly','Over-provisioned','Contract Anomaly','SLA Risk'],datasets:[{data:[23,38,34,28,20],backgroundColor:['#ff4455','#ffb800','#0099ff','#a855f7','#ff6b35'],borderWidth:0,hoverOffset:8}]}});
+}
+function initAnalyticsCharts(){
+  makeChart('analyticsChart',{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],datasets:[
+    {label:'Total Enterprise Spend',data:[12.1,11.8,11.4,11.9,12.3,12.8,11.9,11.2,10.8,10.4,10.6,10.37].map(v=>v*1000000),borderColor:'#ff4455',backgroundColor:'rgba(255,68,85,0.1)',fill:true,tension:0.4,pointRadius:4},
+    {label:'AI-Optimized Spend',data:[null,null,null,null,null,null,11.2,10.6,10.1,9.8,9.9,10.37].map(v=>v?v*1000000:null),borderColor:'#00d4aa',backgroundColor:'rgba(0,212,170,0.1)',fill:true,tension:0.4,pointRadius:4,borderDash:[4,4]},
+  ]},options:{scales:{y:{ticks:{callback:v=>'$'+(v/1000000).toFixed(1)+'M'}}}}});
+}
+function initSpendCharts(){
+  makeChart('vendorChart',{type:'bar',data:{labels:['Oracle','AWS','Salesforce','Microsoft','Zoom','SAP'],datasets:[
+    {label:'Current Rate',data:[420,380,290,340,120,480],backgroundColor:'rgba(255,68,85,0.7)',borderRadius:6},
+    {label:'Benchmark Rate',data:[310,290,210,280,85,360],backgroundColor:'rgba(0,212,170,0.7)',borderRadius:6},
+  ]},options:{scales:{y:{ticks:{callback:v=>'$'+v+'K'}}}}});
+  makeChart('spendPieChart',{type:'pie',data:{labels:['Cloud Infra','SaaS Licenses','Professional Services','Hardware','Logistics','Other'],datasets:[{data:[34,22,18,12,9,5],backgroundColor:['#0099ff','#00d4aa','#ffb800','#a855f7','#ff6b35','#5a6278'],borderWidth:0}]}});
+}
+function initSLAChart(){
+  makeChart('slaChart',{type:'line',data:{labels:['Week 1','Week 2','Week 3','Week 4','Week 5','Week 6','Week 7','Week 8'],datasets:[
+    {label:'SLA Compliance %',data:[98.9,99.1,98.4,97.8,98.6,99.0,98.2,97.4],borderColor:'#00d4aa',tension:0.4,fill:false,pointRadius:4},
+    {label:'SLA Threshold',data:[99.5,99.5,99.5,99.5,99.5,99.5,99.5,99.5],borderColor:'#ff4455',borderDash:[6,3],fill:false,pointRadius:0},
+  ]},options:{scales:{y:{min:95,max:101,ticks:{callback:v=>v+'%'}}}}});
+}
+function initFinopsCharts(){
+  makeChart('varianceChart',{type:'bar',data:{labels:['Vendor Dup.','Infra','License Opt.','SaaS Contracts'],datasets:[{label:'Variance ($K)',data:[42,2.64,-4.2,6.2],backgroundColor:d=>d.raw>=0?'rgba(255,68,85,0.7)':'rgba(0,212,170,0.7)',borderRadius:6}]},options:{scales:{y:{ticks:{callback:v=>'$'+v+'K'}}}}});
+}
+
+// ============================================================
+// INIT ALL
+// ============================================================
+function init(){
+  buildAlertFeed();
+  buildAgentLog();
+  buildAnomalyTable();
+  buildDuplicateTable();
+  buildSLACards();
+  buildSLAAlerts();
+  buildPenaltyCalc();
+  buildHeatmap();
+  buildRecCards();
+  buildTeamAllocation();
+  buildChangeLog();
+  buildTxTable();
+  buildVarianceTable();
+  buildApprovals();
+  buildPlaybooks();
+  buildReports();
+  buildSettings();
+  buildNotifs();
+  initDashboardCharts();
+}
+init();
+
+// Auto-update KPIs to feel live
+setInterval(()=>{
+  const el = document.getElementById('kpi2');
+  if(el){
+    const v = parseInt(el.textContent);
+    el.textContent = v + (Math.random()>0.7?1:0);
+  }
+},8000);
+</script>
+</body>
+</html>
